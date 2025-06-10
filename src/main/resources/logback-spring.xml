@@ -2,6 +2,7 @@
 <configuration>
     <!-- 프로퍼티: 로그 파일 저장 경로 -->
     <property name="LOGS_PATH" value="./logs"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
 
     <!-- 파일 출력 앱엔더 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -17,8 +18,13 @@
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-        <encoder>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%logger{36}] - %msg%n</pattern>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="roomescape.logging.layout.MaskingPatternLayout">
+                <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
+                <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
+                <!-- 로그 포맷: 날짜, 레벨, 로거 이름, 메시지 -->
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
         </encoder>
     </appender>
 
@@ -30,10 +36,30 @@
         </encoder>
     </appender>
 
-    <!-- 루트 로그 레벨 INFO 이상만 저장/출력 -->
-    <root level="info">
-        <appender-ref ref="FILE"/>
-        <!-- 개발/테스트 환경에서는 콘솔 로깅도 함께 사용 권장 -->
-        <appender-ref ref="CONSOLE"/> <!-- 주석 해제 시 콘솔 로깅 활성화 -->
-    </root>
+    <!-- 기본(default) 프로파일: 파일+콘솔, INFO 이상 로그 -->
+    <springProfile name="default">
+        <!-- 루트 로그 레벨 INFO 이상만 저장/출력 -->
+        <root level="info">
+            <appender-ref ref="FILE"/>
+            <!-- 개발/테스트 환경에서는 콘솔 로깅도 함께 사용 권장 -->
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 테스트(test) 프로파일: 파일+콘솔, DEBUG 이상 로그 -->
+    <springProfile name="test">
+        <!-- 루트 로그 레벨 DEBUG 이상 저장/출력 -->
+        <root level="debug">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 운영(prod) 프로파일: 파일만, WARN 이상 로그 -->
+    <springProfile name="prod">
+        <!-- 루트 로그 레벨 WARN 이상만 파일로 저장 -->
+        <root level="warn">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
 </configuration>

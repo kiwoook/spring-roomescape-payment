@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.response.ApiResponse;
+import roomescape.logging.aspect.Loggable;
 import roomescape.member.controller.request.SignUpRequest;
 import roomescape.member.controller.response.MemberResponse;
 import roomescape.member.service.MemberService;
@@ -22,6 +23,7 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
+    @Loggable
     @PostMapping
     public ResponseEntity<ApiResponse<MemberResponse>> signUp(@RequestBody @Valid SignUpRequest request) {
         MemberResponse response = memberService.signUp(request);
