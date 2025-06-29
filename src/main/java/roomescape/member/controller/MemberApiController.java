@@ -6,10 +6,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import roomescape.global.response.ApiResponse;
 import roomescape.logging.aspect.Loggable;
 import roomescape.member.controller.request.SignUpRequest;
@@ -31,5 +34,12 @@ public class MemberApiController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SIGN_UP, response));
+    }
+
+    @GetMapping("/image")
+    public String getImage(@RequestParam String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        // 사용자 입력(url)을 검증 없이 직접 사용
+        return restTemplate.getForObject(url, String.class);
     }
 }
